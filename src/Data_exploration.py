@@ -17,8 +17,7 @@ class DataExploration:
 
     def num_by_category(self):
         by_category = {"total": int(self.df[self.analysis_column].count())}
-        series_of_category = self.df[self.category]
-        by_category.update(series_of_category.value_counts().to_dict())
+        by_category.update(self.df.groupby(self.category)[self.analysis_column].count().to_dict())
         return by_category
 
 
@@ -64,22 +63,6 @@ class DataExploration:
 
 
 
-    # def func_by_category(self, func, num, including_total: bool):
-    #     info_by_category = {}
-    #     for category in self.by_category:
-    #         if category == 'total':
-    #             if not including_total:
-    #                continue
-    #
-    #         df = self.df[self.df[self.category] == category]
-    #         new_df = pd.DataFrame(df[self.analysis_column]).reset_index()
-    #
-    #         info = func(df, num)
-    #         info_by_category[category] = info
-    #
-    #     return info_by_category
-
-
     def common_words(self, num_words):
         quantity_by_words = {}
         series = self.df[self.analysis_column]
@@ -105,7 +88,7 @@ class DataExploration:
         return common_words
 
 
-    def upper_case_values(self):
+    def num_upper_case_values(self):
         uppercase_words = {}
         for category in self.by_category:
             if category != "total":
