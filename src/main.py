@@ -9,11 +9,11 @@ def get_df_information(analysis_column, category):
     data_exploration = DataExploration(df, analysis_column, category)
 
     # all information about Text column by total df and category
-    num_by_category = data_exploration.num_by_category()
-    average_words = data_exploration.average_words()
+    num_by_category = data_exploration.num_by_total_and_category()
+    average_words = data_exploration.func_by_total_or_category(data_exploration.average_words, total=True, category=True)
     common_words = data_exploration.common_words(10)
-    long_texts = data_exploration.long_texts(3)
-    num_upper_case_values = data_exploration.num_upper_case_values()
+    long_texts = data_exploration.func_by_total_or_category(data_exploration.long_texts, total=False, category=True, num=3)
+    num_upper_case_values = data_exploration.func_by_total_or_category(data_exploration.num_upper_case_values, total=True, category=True)
 
     # dict with all this information
     results = {"total_tweets": num_by_category,
@@ -26,7 +26,7 @@ def get_df_information(analysis_column, category):
     return results
 
 
-def num_to_describe(results):
+def change_names_keys(results):
     # copy results dict to new one -  all '1' key turns into 'antisemitic' and all '0' key turns into 'non_antisemitic'
     clear_information = {}
     for data in results:
@@ -69,7 +69,7 @@ if __name__ =='__main__':
 
     # get to all information about analysis column by category
     results = get_df_information(analysis_column, category)
-    clear_information = num_to_describe(results)
+    clear_information = change_names_keys(results)
 
     # write all results to results.json file
     Writer.write_json('../results/results.json', clear_information)
@@ -77,6 +77,8 @@ if __name__ =='__main__':
     # clean the df and save it in results
     clean_df = clean_df(df)
     clean_df.to_csv('../results/tweets_dataset_cleaned.csv')
+
+    data_exploration = DataExploration(df, analysis_column, category)
 
 
 

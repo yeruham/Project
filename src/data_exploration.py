@@ -16,36 +16,28 @@ class DataExploration:
 
 
     def num_by_category(self):
-        by_category = {"total": int(self.df[self.analysis_column].count())}
-        by_category.update(self.df.groupby(self.category)[self.analysis_column].count().to_dict())
+        by_category = self.df.groupby(self.category)[self.analysis_column].count().to_dict()
         return by_category
 
 
-    def average_words(self):
-        average_values = {}
-        for category in self.by_category:
+    def num_by_total_and_category(self):
+        by_all = {"total": int(self.df[self.analysis_column].count())}
+        by_all.update(self.by_category)
+        return by_all
 
-            if category != "total":
-                df = self.df[self.df[self.category] == category]
-            else:
-                df = self.df
+    def average_words(self, df):
 
             sum_all = 0
             for text in df[self.analysis_column]:
                 words = text.split()
                 sum_all += len(words)
-            average_values[category] = sum_all / df.shape[0]
 
-        return  average_values
+            return sum_all / df.shape[0]
 
 
-    def long_texts(self, num_texts):
-        long_texts_by_category = {}
-        for category in self.by_category:
-            if category == "total":
-                continue
 
-            df = self.df[self.df[self.category] == category]
+    def long_texts(self, df, num_texts):
+
             new_df = pd.DataFrame(df[self.analysis_column]).reset_index()
             long_texts = []
 
@@ -57,10 +49,7 @@ class DataExploration:
             for i in range(0, num_texts):
                 long_texts.append(new_df.loc[i, self.analysis_column])
 
-            long_texts_by_category[category] = long_texts
-
-        return long_texts_by_category
-
+            return long_texts
 
 
     def common_words(self, num_words):
@@ -81,20 +70,14 @@ class DataExploration:
             words.append(word)
             amount_of_words.append(amount)
 
-        df_of_amount_of_words = pd.DataFrame({'word': words, 'amount': amount_of_words})
-        df_of_amount_of_words = df_of_amount_of_words.sort_values(by='amount', ascending=False).reset_index()
+        df_amount_of_words = pd.DataFrame({'word': words, 'amount': amount_of_words})
+        df_amount_of_words = df_amount_of_words.sort_values(by='amount', ascending=False).reset_index()
 
-        common_words = df_of_amount_of_words.loc[:num_words, 'word'].to_list()
+        common_words = df_amount_of_words.loc[:num_words, 'word'].to_list()
         return common_words
 
 
-    def num_upper_case_values(self):
-        uppercase_words = {}
-        for category in self.by_category:
-            if category != "total":
-                df = self.df[self.df[self.category] == category]
-            else:
-                df = self.df
+    def num_upper_case_values(self, df):
 
             series = df[self.analysis_column]
             num_upper_case = 0
@@ -104,10 +87,27 @@ class DataExploration:
                     if word.isupper():
                         num_upper_case += 1
 
-            uppercase_words[category] = num_upper_case
-
-        return uppercase_words
+            return num_upper_case
 
 
 
+    def func_by_total_or_category(self, func, total: bool, category: bool, num= None):
+        information = {}
+        if total:
+            if num:
+                results = func(self.df, num)
+            else:
+                results = func(self.df)
+            information['total'] = results
+        if category:
+            for c in self.by_category:
+                df = self.df[self.df[self.category] == c]
+                if num:
+                    results = func(df, num)
+                else:
+                    results = func(df)
+
+                information[c] = results
+
+        return information
 

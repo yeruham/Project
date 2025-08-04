@@ -13,8 +13,6 @@ class Cleaner:
 
     def remove_punctuation_marks(self, column):
         symbols = string.punctuation
-        # symbols = '[!#$%&()*+-./:;<=>?@[\]^_`{|}~]'
-        # self.df[column] = self.df[column].str.replace(symbols, "")
         for i in self.df.loc[:,column].index:
             new_text = ""
             for signal in self.df.loc[i, column]:
