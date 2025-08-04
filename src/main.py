@@ -1,12 +1,15 @@
-from src.Data_exploration import DataExploration
+from src.cleaner import Cleaner
+from src.data_exploration import DataExploration
 from src.loader import Loader
 from src.writer import Writer
 
 # load tweets_dataset.csv file to Data Frame
 url = 'C:/python_data/TestProject/data/tweets_dataset.csv'
 df = Loader.load_csv(url)
+analysis_column = 'Text'
+category = 'Biased'
 # object initialization of DataExploration with one column as a category ('Biased'), and a second column to analysis (''Text)
-data_exploration = DataExploration(df, 'Text', 'Biased')
+data_exploration = DataExploration(df, analysis_column, category)
 
 # all information about Text column by total df and category
 num_by_category = data_exploration.num_by_category()
@@ -43,3 +46,10 @@ for data in results:
 Writer.write_json('../results/results.json', clear_information)
 
 
+cleaner = Cleaner(df)
+cleaner.column_selection([analysis_column, category])
+cleaner.remove_punctuation_marks(analysis_column)
+cleaner.convert_to_lowercase(analysis_column)
+cleaner.remove_by_category(category)
+
+cleaner.df.to_csv('../results/tweets_dataset_cleaned.csv')
