@@ -12,7 +12,7 @@
     - data  
         with csv file  
     - src  
-        with python code
-    - results
+        with python code  
+    - results  
         results of all process (json file and csv file)
 
